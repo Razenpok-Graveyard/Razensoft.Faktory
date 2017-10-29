@@ -9,9 +9,13 @@ namespace Razensoft.Faktory
     {
         private FaktoryConnection connection;
 
+        public string Password { get; set; }
+
         public async Task ConnectAsync(string host, int port = 7419)
         {
             connection = new FaktoryConnection();
+            if (!string.IsNullOrEmpty(Password))
+                connection.Password = Password;
             await connection.ConnectAsync(host, port);
         }
 
@@ -37,7 +41,7 @@ namespace Razensoft.Faktory
                     case MessageVerb.Ok:
                         continue;
                     case MessageVerb.None:
-                        await ExecuteJobAsync(message.ParseJsonPayload<Job>());
+                        await ExecuteJobAsync(message.Deserialize<Job>());
                         break;
                     default:
                         throw new Exception("Whoopsie");

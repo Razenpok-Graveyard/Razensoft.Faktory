@@ -33,7 +33,7 @@ namespace Razensoft.Faktory
             return Enum.TryParse(value, true, out MessageVerb verb) ? verb : MessageVerb.Unknown;
         }
 
-        public T ParseJsonPayload<T>()
+        public T Deserialize<T>()
         {
             return JsonConvert.DeserializeObject<T>(Payload);
         }

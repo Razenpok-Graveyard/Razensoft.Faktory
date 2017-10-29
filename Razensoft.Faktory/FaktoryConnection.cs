@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Razensoft.Faktory.Resp;
@@ -23,6 +25,8 @@ namespace Razensoft.Faktory
 
         public ConnectionIdentity Identity { get; }
 
+        public string Password { get; set; }
+
         public async Task ConnectAsync(string host, int port = 7419)
         {
             await tcpClient.ConnectAsync(host, port);
@@ -32,16 +36,30 @@ namespace Razensoft.Faktory
             streamWriter = CreateStreamWriter(stream);
             respWriter = new RespWriter(streamWriter);
             var message = await ReceiveAsync();
-            // TODO: proper handling + version
             if (message.Verb != MessageVerb.Hi)
                 throw new Exception("Whoopsie");
             Console.WriteLine($"HI {message.Payload}");
+            // TODO: proper handling + version
+            var handshake = message.Deserialize<FaktoryHandshake>();
+            if (handshake.Nonce != null)
+                Identity.PasswordHash = GetPasswordHash(Password, handshake.Nonce);
             await SendAsync(new FaktoryMessage(MessageVerb.Hello, Identity));
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");
             Console.WriteLine("OK");
             MaintainHeartBeatAsync();
+        }
+
+        private static string GetPasswordHash(string password, string nonce)
+        {
+            using (var sha = SHA256.Create())
+            {
+                var encoding = Encoding.UTF8;
+                var bytes = encoding.GetBytes(password + nonce);
+                var hash = sha.ComputeHash(bytes);
+                return string.Concat(hash.Select(b => b.ToString("x2")));
+            }
         }
 
         private async void MaintainHeartBeatAsync()
