@@ -7,9 +7,13 @@ namespace Razensoft.Faktory
     {
         private FaktoryConnection connection;
 
+        public string Password { get; set; }
+
         public async Task ConnectAsync(string host, int port = 7419)
         {
             connection = new FaktoryConnection();
+            if (!string.IsNullOrEmpty(Password))
+                connection.Password = Password;
             await connection.ConnectAsync(host, port);
         }
 
