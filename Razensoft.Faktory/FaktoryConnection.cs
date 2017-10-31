@@ -55,7 +55,7 @@ namespace Razensoft.Faktory
         {
             using (var sha = SHA256.Create())
             {
-                var encoding = Encoding.UTF8;
+                var encoding = Encoding.ASCII;
                 var bytes = encoding.GetBytes(password + nonce);
                 var hash = sha.ComputeHash(bytes);
                 return string.Concat(hash.Select(b => b.ToString("x2")));

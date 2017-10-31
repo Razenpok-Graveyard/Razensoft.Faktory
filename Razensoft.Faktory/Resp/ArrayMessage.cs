@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Razensoft.Faktory.Resp
@@ -15,7 +16,7 @@ namespace Razensoft.Faktory.Resp
 
         public override string MessagePrefix => TypeDescriptor.ToString();
 
-        protected override async Task DeserializeAsync(StreamReader reader, int length)
+        protected override async Task DeserializePayloadAsync(StreamReader reader, int length)
         {
             Payload = new RespMessage[length];
             var respReader = new RespReader(reader);
@@ -23,11 +24,27 @@ namespace Razensoft.Faktory.Resp
                 Payload[i] = await respReader.ReadAsync();
         }
 
-        protected override async Task SerializePayload(StreamWriter writer)
+        protected override async Task SerializePayloadAsync(StreamWriter writer)
         {
             var respWriter = new RespWriter(writer);
             foreach (var message in Payload)
                 await respWriter.WriteAsync(message);
         }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((ArrayMessage)obj);
+        }
+
+        private bool Equals(ArrayMessage other)
+        {
+            return ReferenceEquals(null, other.Payload) && ReferenceEquals(null, Payload)
+                || ReferenceEquals(Payload, other.Payload)
+                || Payload.SequenceEqual(other.Payload);
+        }
+
+        public override int GetHashCode() => Payload.GetHashCode();
     }
 }

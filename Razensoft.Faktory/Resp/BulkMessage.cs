@@ -19,17 +19,17 @@ namespace Razensoft.Faktory.Resp
                 Payload = default;
                 return;
             }
-            await DeserializeAsync(reader, payloadLength);
+            await DeserializePayloadAsync(reader, payloadLength);
         }
 
-        protected abstract Task DeserializeAsync(StreamReader reader, int length);
+        protected abstract Task DeserializePayloadAsync(StreamReader reader, int length);
 
         public sealed override async Task SerializeAsync(StreamWriter writer)
         {
             await writer.WriteLineAsync(PayloadLength.ToString());
-            await SerializePayload(writer);
+            await SerializePayloadAsync(writer);
         }
 
-        protected abstract Task SerializePayload(StreamWriter writer);
+        protected abstract Task SerializePayloadAsync(StreamWriter writer);
     }
 }
