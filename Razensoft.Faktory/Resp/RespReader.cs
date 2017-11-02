@@ -21,21 +21,21 @@ namespace Razensoft.Faktory.Resp
             switch (typeCharBuffer[0])
             {
                 case SimpleStringMessage.TypeDescriptor:
-                    return await Deserialise<SimpleStringMessage>();
+                    return await Deserialize<SimpleStringMessage>();
                 case ErrorMessage.TypeDescriptor:
-                    return await Deserialise<ErrorMessage>();
+                    return await Deserialize<ErrorMessage>();
                 case IntegerMessage.TypeDescriptor:
-                    return await Deserialise<IntegerMessage>();
+                    return await Deserialize<IntegerMessage>();
                 case BulkStringMessage.TypeDescriptor:
-                    return await Deserialise<BulkStringMessage>();
+                    return await Deserialize<BulkStringMessage>();
                 case ArrayMessage.TypeDescriptor:
-                    return await Deserialise<ArrayMessage>();
+                    return await Deserialize<ArrayMessage>();
                 default:
                     throw new ArgumentException($"Unknown type descriptor {typeCharBuffer[0]}");
             }
         }
 
-        private async Task<T> Deserialise<T>() where T : RespMessage, new()
+        private async Task<T> Deserialize<T>() where T : RespMessage, new()
         {
             var message = new T();
             await message.DeserializeAsync(streamReader);
