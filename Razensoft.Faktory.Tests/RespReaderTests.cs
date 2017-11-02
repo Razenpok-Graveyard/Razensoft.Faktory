@@ -22,7 +22,7 @@ namespace Razensoft.Faktory.Tests
         {
             var reader = ArrangeTestCase(input);
             var actual = await reader.ReadAsync();
-            Assert.That(expected, Is.EqualTo(actual));
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [Test]

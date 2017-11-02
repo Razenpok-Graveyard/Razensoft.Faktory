@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Razensoft.Faktory.Resp
 {
-    public abstract class BulkMessage<T> : RespMessage<T>
+    public abstract class BulkMessage<T> : RespMessage<T> where T : class
     {
         protected BulkMessage() { }
 
@@ -16,7 +16,7 @@ namespace Razensoft.Faktory.Resp
             var payloadLength = int.Parse(await reader.ReadLineAsync());
             if (payloadLength == -1)
             {
-                Payload = default;
+                Payload = null;
                 return;
             }
             await DeserializePayloadAsync(reader, payloadLength);
@@ -26,6 +26,11 @@ namespace Razensoft.Faktory.Resp
 
         public sealed override async Task SerializeAsync(StreamWriter writer)
         {
+            if (Payload == null)
+            {
+                await writer.WriteLineAsync("-1");
+                return;
+            }
             await writer.WriteLineAsync(PayloadLength.ToString());
             await SerializePayloadAsync(writer);
         }
