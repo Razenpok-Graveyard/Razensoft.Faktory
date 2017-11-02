@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Razensoft.Faktory
@@ -11,10 +12,14 @@ namespace Razensoft.Faktory
 
         public async Task ConnectAsync(string host, int port = 7419)
         {
-            connection = new FaktoryConnection();
-            if (!string.IsNullOrEmpty(Password))
-                connection.Password = Password;
-            await connection.ConnectAsync(host, port);
+            var configuration = new FaktoryConnectionConfiguration
+            {
+                IpAddress = IPAddress.Parse(host),
+                Port = port,
+                Password = Password
+            };
+            connection = new FaktoryConnection(configuration);
+            await connection.ConnectAsync();
         }
 
         public async Task PublishAsync(Job job)

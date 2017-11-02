@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,26 +10,24 @@ namespace Razensoft.Faktory
 {
     public class FaktoryConnection: IDisposable
     {
+        private readonly IConnectionConfiguration configuration;
+        private IConnectionTransport transport;
         private bool isDisposed;
-        private readonly TcpClient tcpClient;
         private RespReader reader;
         private RespWriter respWriter;
         private StreamWriter streamWriter;
 
-        public FaktoryConnection()
+        public FaktoryConnection(IConnectionConfiguration configuration)
         {
-            tcpClient = new TcpClient();
-            Identity = ConnectionIdentity.GenerateNew();
+            this.configuration = configuration;
         }
 
-        public ConnectionIdentity Identity { get; }
+        public FaktoryConnection(): this(new FaktoryConnectionConfiguration()) { }
 
-        public string Password { get; set; }
-
-        public async Task ConnectAsync(string host, int port = 7419)
+        public async Task ConnectAsync()
         {
-            await tcpClient.ConnectAsync(host, port);
-            var stream = tcpClient.GetStream();
+            transport = configuration.TransportFactory.CreateTransport();
+            var stream = await transport.GetStream();
             var streamReader = CreateStreamReader(stream);
             reader = new RespReader(streamReader);
             streamWriter = CreateStreamWriter(stream);
@@ -42,8 +39,8 @@ namespace Razensoft.Faktory
             // TODO: proper handling + version
             var handshake = message.Deserialize<FaktoryHandshake>();
             if (handshake.Nonce != null)
-                Identity.PasswordHash = GetPasswordHash(Password, handshake.Nonce);
-            await SendAsync(new FaktoryMessage(MessageVerb.Hello, Identity));
+                configuration.Identity.PasswordHash = GetPasswordHash(configuration.Password, handshake.Nonce);
+            await SendAsync(new FaktoryMessage(MessageVerb.Hello, configuration.Identity));
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");
@@ -64,12 +61,11 @@ namespace Razensoft.Faktory
 
         private async void MaintainHeartBeatAsync()
         {
-            const int heartBeatPeriod = 30 * 1000; //ms
-            var message = new FaktoryMessage(MessageVerb.Beat, Identity);
+            var message = new FaktoryMessage(MessageVerb.Beat, configuration.Identity);
             while (!isDisposed)
             {
                 await SendAsync(message);
-                await Task.Delay(heartBeatPeriod);
+                await Task.Delay(configuration.HeartBeatPeriod);
                 // TODO: response
             }
         }
@@ -112,7 +108,7 @@ namespace Razensoft.Faktory
         public void Dispose()
         {
             isDisposed = true;
-            tcpClient.Dispose();
+            transport.Dispose();
         }
     }
 }
