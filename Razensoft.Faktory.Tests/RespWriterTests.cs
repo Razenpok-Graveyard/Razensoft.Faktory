@@ -22,7 +22,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestSimpleStringWrite()
+        public async Task WriteSimpleString()
         {
             await AssertWrite(
                 new SimpleStringMessage("OK"),
@@ -30,7 +30,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestErrorWrite()
+        public async Task WriteError()
         {
             await AssertWrite(
                 new ErrorMessage("ERR unknown command 'foobar'"),
@@ -38,7 +38,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestIntegerWrite()
+        public async Task WriteInteger()
         {
             await AssertWrite(
                 new IntegerMessage(1000),
@@ -46,7 +46,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestBulkStringWrite()
+        public async Task WriteBulkString()
         {
             await AssertWrite(
                 new BulkStringMessage("foobar"),
@@ -54,7 +54,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestEmptyBulkStringWrite()
+        public async Task WriteEmptyBulkString()
         {
             await AssertWrite(
                 new BulkStringMessage(string.Empty),
@@ -62,7 +62,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestNullBulkStringWrite()
+        public async Task WriteNullBulkString()
         {
             await AssertWrite(
                 new BulkStringMessage(null),
@@ -70,7 +70,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestArrayWrite()
+        public async Task WriteArray()
         {
             await AssertWrite(
                 new ArrayMessage(new RespMessage[]
@@ -82,7 +82,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestEmptyArrayWrite()
+        public async Task WriteEmptyArray()
         {
             await AssertWrite(
                 new ArrayMessage(new RespMessage[0]),
@@ -90,7 +90,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestMixedArrayWrite()
+        public async Task WriteMixedArray()
         {
             await AssertWrite(
                 new ArrayMessage(new RespMessage[]
@@ -111,7 +111,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestNullArrayWrite()
+        public async Task WriteNullArray()
         {
             await AssertWrite(
                 new ArrayMessage(null),
@@ -119,7 +119,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestNullContainingArrayWrite()
+        public async Task WriteNullContainingArray()
         {
             await AssertWrite(
                 new ArrayMessage(new RespMessage[]
@@ -132,7 +132,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestInlineCommandWrite()
+        public async Task WriteInlineCommand()
         {
             await AssertWrite(
                 new InlineCommandMessage("PING"),

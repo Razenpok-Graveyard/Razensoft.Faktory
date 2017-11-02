@@ -26,7 +26,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestSimpleStringRead()
+        public async Task ReadSimpleString()
         {
             await AssertRead(
                 "+OK\r\n",
@@ -34,7 +34,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestErrorRead()
+        public async Task ReadError()
         {
             await AssertRead(
                 "-ERR unknown command 'foobar'\r\n",
@@ -42,7 +42,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestIntegerRead()
+        public async Task ReadInteger()
         {
             await AssertRead(
                 ":1000\r\n",
@@ -50,7 +50,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestBulkStringRead()
+        public async Task ReadBulkString()
         {
             await AssertRead(
                 "$6\r\nfoobar\r\n",
@@ -58,7 +58,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestEmptyBulkStringRead()
+        public async Task ReadEmptyBulkString()
         {
             await AssertRead(
                 "$0\r\n\r\n",
@@ -66,7 +66,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestNullBulkStringRead()
+        public async Task ReadNullBulkString()
         {
             await AssertRead(
                 "$-1\r\n",
@@ -74,7 +74,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestArrayRead()
+        public async Task ReadArray()
         {
             await AssertRead(
                 "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n",
@@ -86,7 +86,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestEmptyArrayRead()
+        public async Task ReadEmptyArray()
         {
             await AssertRead(
                 "*0\r\n",
@@ -94,7 +94,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestMixedArrayRead()
+        public async Task ReadMixedArray()
         {
             await AssertRead(
                 "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Foo\r\n-Bar\r\n",
@@ -115,7 +115,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestNullArrayRead()
+        public async Task ReadNullArray()
         {
             await AssertRead(
                 "*-1\r\n",
@@ -123,7 +123,7 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task TestNullContainingArrayRead()
+        public async Task ReadNullContainingArray()
         {
             await AssertRead(
                 "*3\r\n$3\r\nfoo\r\n$-1\r\n$3\r\nbar\r\n",
