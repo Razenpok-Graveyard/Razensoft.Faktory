@@ -6,6 +6,8 @@ namespace Razensoft.Faktory.Serialization
     [DataContract]
     public class JobDto
     {
+        public JobDto() { }
+
         public JobDto(Job job)
         {
             JobId = job.Id;

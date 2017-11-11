@@ -50,7 +50,7 @@ namespace Razensoft.Faktory
                     case MessageVerb.Ok:
                         continue;
                     case MessageVerb.None:
-                        await ExecuteJobAsync(message.Deserialize<Job>());
+                        await ExecuteJobAsync(new Job(message.Deserialize<JobDto>()));
                         break;
                     default:
                         throw new Exception("Whoopsie");
