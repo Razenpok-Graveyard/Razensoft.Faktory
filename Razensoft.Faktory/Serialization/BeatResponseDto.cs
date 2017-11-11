@@ -6,6 +6,6 @@ namespace Razensoft.Faktory.Serialization
     public class BeatResponseDto
     {
         [DataMember(Name = "signal")]
-        public BeatState? WorkerId { get; set; }
+        public BeatState? Signal { get; set; }
     }
 }

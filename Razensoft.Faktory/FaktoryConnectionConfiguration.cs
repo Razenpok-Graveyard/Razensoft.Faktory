@@ -20,8 +20,6 @@ namespace Razensoft.Faktory
 
         public string Password { get; set; }
 
-        public int HeartBeatPeriod { get; set; } = 30 * 1000;
-
         public ConnectionIdentity Identity { get; } = ConnectionIdentity.GenerateNew();
 
         IConnectionTransportFactory IConnectionConfiguration.TransportFactory => transportFactory;

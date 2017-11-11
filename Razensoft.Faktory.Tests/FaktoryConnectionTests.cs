@@ -32,9 +32,6 @@ namespace Razensoft.Faktory.Tests
                 .Setup(c => c.TransportFactory)
                 .Returns(transportFactory.Object);
             configuration
-                .Setup(c => c.HeartBeatPeriod)
-                .Returns(30 * 1000);
-            configuration
                 .Setup(c => c.Identity)
                 .Returns(ConnectionIdentity.GenerateNew);
             var connection = new FaktoryConnection(configuration.Object);

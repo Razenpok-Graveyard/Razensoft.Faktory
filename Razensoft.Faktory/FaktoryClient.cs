@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using Razensoft.Faktory.Serialization;
 
@@ -7,19 +6,17 @@ namespace Razensoft.Faktory
 {
     public class FaktoryClient
     {
+        private readonly FaktoryWorkerConfiguration configuration;
         private FaktoryConnection connection;
 
-        public string Password { get; set; }
-
-        public async Task ConnectAsync(string host, int port = 7419)
+        public FaktoryClient(FaktoryWorkerConfiguration configuration)
         {
-            var configuration = new FaktoryConnectionConfiguration
-            {
-                IpAddress = IPAddress.Parse(host),
-                Port = port,
-                Password = Password
-            };
-            connection = new FaktoryConnection(configuration);
+            this.configuration = configuration;
+        }
+
+        public async Task ConnectAsync()
+        {
+            connection = new FaktoryConnection(configuration.Connection);
             await connection.ConnectAsync();
         }
 

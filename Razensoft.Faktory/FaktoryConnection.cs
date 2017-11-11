@@ -11,16 +11,15 @@ namespace Razensoft.Faktory
     public class FaktoryConnection : IDisposable
     {
         private readonly IConnectionConfiguration configuration;
-        private bool isDisposed;
         private RespReader reader;
         private RespWriter respWriter;
         private IConnectionTransport transport;
+        private readonly string id = Guid.NewGuid().ToString();
 
         public FaktoryConnection(IConnectionConfiguration configuration) => this.configuration = configuration;
 
         public void Dispose()
         {
-            isDisposed = true;
             transport.Dispose();
         }
 
@@ -33,7 +32,6 @@ namespace Razensoft.Faktory
             var message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Hi)
                 throw new Exception("Whoopsie");
-            Console.WriteLine($"HI {message.Payload}");
             // TODO: proper version handling
             var handshake = message.Deserialize<HandshakeRequestDto>();
             if (handshake.Nonce != null)
@@ -42,8 +40,6 @@ namespace Razensoft.Faktory
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");
-            Console.WriteLine("OK");
-            MaintainHeartBeatAsync();
         }
 
         private static string GetPasswordHash(string password, string nonce)
@@ -57,25 +53,17 @@ namespace Razensoft.Faktory
             }
         }
 
-        private async void MaintainHeartBeatAsync()
-        {
-            var message = new FaktoryMessage(MessageVerb.Beat, new BeatRequestDto(configuration.Identity));
-            while (!isDisposed)
-            {
-                await SendAsync(message);
-                await Task.Delay(configuration.HeartBeatPeriod);
-                // TODO: response
-            }
-        }
-
         public async Task<FaktoryMessage> ReceiveAsync()
         {
             var respMessage = await reader.ReadAsync();
+
             switch (respMessage)
             {
                 case SimpleStringMessage simpleString:
+                    Console.WriteLine($"{id} - receiving {simpleString.Payload}");
                     return new FaktoryMessage(simpleString);
                 case BulkStringMessage bulkString:
+                    Console.WriteLine($"{id} - receiving {bulkString.Payload}");
                     return new FaktoryMessage(bulkString);
             }
             return new FaktoryMessage(MessageVerb.Unknown, null);
@@ -84,9 +72,9 @@ namespace Razensoft.Faktory
         public async Task SendAsync(FaktoryMessage message)
         {
             var line = $"{message.Verb.ToString().ToUpper()} {message.Payload}";
+            Console.WriteLine($"{id} - sending {line}");
             var respMessage = new InlineCommandMessage(line);
             await respWriter.WriteAsync(respMessage);
-            //await streamWriter.FlushAsync();
         }
     }
 }

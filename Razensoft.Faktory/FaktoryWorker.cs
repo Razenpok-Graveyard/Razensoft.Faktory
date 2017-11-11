@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Razensoft.Faktory.Serialization;
@@ -11,47 +9,31 @@ namespace Razensoft.Faktory
     public class FaktoryWorker
     {
         private readonly CancellationTokenSource fetchCancelSource = new CancellationTokenSource();
+        private readonly FaktoryWorkerConfiguration configuration;
+        private bool isTerminating;
 
-        // DRAFT - will move to reflection-based
-        private readonly Dictionary<string, Action<object[]>> handlers = new Dictionary<string, Action<object[]>>();
-
-        private FaktoryConnection connection;
-
-        public string Password { get; set; }
-
-        public List<string> SubscribedQueues { get; } = new List<string>();
-
-        public async Task ConnectAsync(string host, int port = 7419)
+        public FaktoryWorker(FaktoryWorkerConfiguration configuration)
         {
-            var configuration = new FaktoryConnectionConfiguration
-            {
-                IpAddress = IPAddress.Parse(host),
-                Port = port,
-                Password = Password
-            };
-            connection = new FaktoryConnection(configuration);
-            await connection.ConnectAsync();
-        }
-
-        public void Register(string job, Action<object[]> handler)
-        {
-            handlers.Add(job, handler);
+            this.configuration = configuration;
         }
 
         public async Task RunAsync()
         {
-            var queuesAggregated = SubscribedQueues.Aggregate((s1, s2) => $"{s1} {s2}");
+            var jobConnection = await EstablishNewConnection();
+            MaintainHeartBeatAsync();
+            var queuesAggregated = configuration.SubscribedQueues.Aggregate((s1, s2) => $"{s1} {s2}");
             var fetchCancel = fetchCancelSource.Token;
             while (!fetchCancel.IsCancellationRequested)
             {
-                await connection.SendAsync(new FaktoryMessage(MessageVerb.Fetch, queuesAggregated));
-                var message = await connection.ReceiveAsync();
+                await jobConnection.SendAsync(new FaktoryMessage(MessageVerb.Fetch, queuesAggregated));
+                var message = await jobConnection.ReceiveAsync();
                 switch (message.Verb)
                 {
                     case MessageVerb.Ok:
+                    case MessageVerb.None when string.IsNullOrEmpty(message.Payload):
                         continue;
                     case MessageVerb.None:
-                        await ExecuteJobAsync(new Job(message.Deserialize<JobDto>()));
+                        await ExecuteJobAsync(new Job(message.Deserialize<JobDto>()), jobConnection);
                         break;
                     default:
                         throw new Exception("Whoopsie");
@@ -59,18 +41,55 @@ namespace Razensoft.Faktory
             }
         }
 
-        private async Task ExecuteJobAsync(Job job)
+        private async void MaintainHeartBeatAsync()
+        {
+            var beatConnection = await EstablishNewConnection();
+            var message = new FaktoryMessage(MessageVerb.Beat, new BeatRequestDto(configuration.Connection.Identity));
+            while (!isTerminating)
+            {
+                await beatConnection.SendAsync(message);
+                var response = await beatConnection.ReceiveAsync();
+                if (response.Verb != MessageVerb.Ok)
+                    throw new Exception("Whoopsie");
+                if (response.Payload != null)
+                {
+                    var dto = response.Deserialize<BeatResponseDto>();
+                    switch (dto.Signal)
+                    {
+                        case BeatState.Quiet:
+                            fetchCancelSource.Cancel();
+                            break;
+                        case BeatState.Terminate:
+                            isTerminating = true;
+                            await Task.Delay(configuration.TerminateTimeout);
+                            // TODO: graceful failing of lingering jobs
+                            Environment.Exit(0);
+                            return;
+                    }
+                }
+                await Task.Delay(configuration.HeartBeatPeriod);
+            }
+        }
+
+        private async Task<FaktoryConnection> EstablishNewConnection()
+        {
+            var connection = new FaktoryConnection(configuration.Connection);
+            await connection.ConnectAsync();
+            return connection;
+        }
+
+        private async Task ExecuteJobAsync(Job job, FaktoryConnection jobConnection)
         {
             if (job == null)
                 return;
-            if (!handlers.TryGetValue(job.Type, out var handler))
+            if (!configuration.Handlers.TryGetValue(job.Type, out var handler))
             {
                 Console.WriteLine($"Cannot execute {job.Type}. Aborting.");
                 var fail = new FailDto(job)
                 {
                     ErrorMessage = $"Cannot execute {job.Type}"
                 };
-                await Fail(fail);
+                await Fail(fail, jobConnection);
                 return;
             }
             try
@@ -79,16 +98,19 @@ namespace Razensoft.Faktory
             }
             catch (Exception e)
             {
-                await Fail(new FailDto(job, e));
+                await Fail(new FailDto(job, e), jobConnection);
             }
-            await connection.SendAsync(new FaktoryMessage(MessageVerb.Ack, new AckDto(job)));
+            await jobConnection.SendAsync(new FaktoryMessage(MessageVerb.Ack, new AckDto(job)));
+            var message = await jobConnection.ReceiveAsync();
+            if (message.Verb != MessageVerb.Ok)
+                throw new Exception("Whoopsie");
         }
 
-        private async Task Fail(FailDto fail)
+        private static async Task Fail(FailDto fail, FaktoryConnection jobConnection)
         {
-            await connection.SendAsync(new FaktoryMessage(MessageVerb.Fail, fail));
-            var message = await connection.ReceiveAsync();
-            if (message.Verb != MessageVerb.None)
+            await jobConnection.SendAsync(new FaktoryMessage(MessageVerb.Fail, fail));
+            var message = await jobConnection.ReceiveAsync();
+            if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");
         }
     }
