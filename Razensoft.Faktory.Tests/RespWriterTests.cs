@@ -11,10 +11,8 @@ namespace Razensoft.Faktory.Tests
         private static async Task AssertWrite(RespMessage input, string expected)
         {
             var stream = new MemoryStream();
-            var streamWriter = new StreamWriter(stream);
-            var respWriter = new RespWriter(streamWriter);
+            var respWriter = new RespWriter(stream);
             await respWriter.WriteAsync(input);
-            await streamWriter.FlushAsync();
             stream.Position = 0;
             var streamReader = new StreamReader(stream);
             var actual = await streamReader.ReadToEndAsync();

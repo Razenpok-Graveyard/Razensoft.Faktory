@@ -13,12 +13,7 @@ namespace Razensoft.Faktory.Tests
         public async Task SimpleConnect()
         {
             var stream = new MemoryStream();
-            var streamWriter = new StreamWriter(stream)
-            {
-                AutoFlush = true,
-                NewLine = "\r\n"
-            };
-            var respWriter = new RespWriter(streamWriter);
+            var respWriter = new RespWriter(stream);
             var hi = new SimpleStringMessage("HI {\"v\":\"1\"}");
             var ok = new SimpleStringMessage("OK");
             await respWriter.WriteAsync(hi);

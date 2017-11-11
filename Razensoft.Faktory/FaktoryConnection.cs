@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,12 +14,9 @@ namespace Razensoft.Faktory
         private bool isDisposed;
         private RespReader reader;
         private RespWriter respWriter;
-        private StreamWriter streamWriter;
         private IConnectionTransport transport;
 
         public FaktoryConnection(IConnectionConfiguration configuration) => this.configuration = configuration;
-
-        public FaktoryConnection() : this(new FaktoryConnectionConfiguration()) { }
 
         public void Dispose()
         {
@@ -32,10 +28,8 @@ namespace Razensoft.Faktory
         {
             transport = configuration.TransportFactory.CreateTransport();
             var stream = await transport.GetStream();
-            var streamReader = CreateStreamReader(stream);
-            reader = new RespReader(streamReader);
-            streamWriter = CreateStreamWriter(stream);
-            respWriter = new RespWriter(streamWriter);
+            reader = new RespReader(stream);
+            respWriter = new RespWriter(stream);
             var message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Hi)
                 throw new Exception("Whoopsie");
@@ -74,16 +68,6 @@ namespace Razensoft.Faktory
             }
         }
 
-        private static StreamReader CreateStreamReader(Stream stream) =>
-            new StreamReader(stream, Encoding.ASCII, true, 1024, true);
-
-        private static StreamWriter CreateStreamWriter(Stream stream) =>
-            new StreamWriter(stream, Encoding.ASCII, 1024, true)
-            {
-                AutoFlush = false,
-                NewLine = "\r\n"
-            };
-
         public async Task<FaktoryMessage> ReceiveAsync()
         {
             var respMessage = await reader.ReadAsync();
@@ -102,7 +86,7 @@ namespace Razensoft.Faktory
             var line = $"{message.Verb.ToString().ToUpper()} {message.Payload}";
             var respMessage = new InlineCommandMessage(line);
             await respWriter.WriteAsync(respMessage);
-            await streamWriter.FlushAsync();
+            //await streamWriter.FlushAsync();
         }
     }
 }

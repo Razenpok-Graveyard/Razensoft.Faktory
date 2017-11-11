@@ -14,8 +14,7 @@ namespace Razensoft.Faktory.Tests
         private static RespReader ArrangeTestCase(string input)
         {
             var stream = new MemoryStream(Encoding.GetBytes(input));
-            var reader = new StreamReader(stream);
-            return new RespReader(reader);
+            return new RespReader(stream);
         }
 
         private static async Task AssertRead(string input, RespMessage expected)
