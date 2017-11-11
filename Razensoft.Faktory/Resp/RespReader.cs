@@ -5,13 +5,18 @@ using System.Threading.Tasks;
 
 namespace Razensoft.Faktory.Resp
 {
-    public class RespReader: IDisposable
+    public class RespReader : IDisposable
     {
         private readonly StreamReader streamReader;
 
         internal RespReader(StreamReader streamReader) => this.streamReader = streamReader;
 
         public RespReader(Stream stream) : this(CreateStreamReader(stream)) { }
+
+        public void Dispose()
+        {
+            streamReader?.Dispose();
+        }
 
         private static StreamReader CreateStreamReader(Stream stream) =>
             new StreamReader(stream, Encoding.ASCII, true, 1024, true);
@@ -44,11 +49,6 @@ namespace Razensoft.Faktory.Resp
             var message = new T();
             await message.DeserializeAsync(streamReader);
             return message;
-        }
-
-        public void Dispose()
-        {
-            streamReader?.Dispose();
         }
     }
 }

@@ -20,54 +20,6 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task WriteSimpleString()
-        {
-            await AssertWrite(
-                new SimpleStringMessage("OK"),
-                "+OK\r\n");
-        }
-
-        [Test]
-        public async Task WriteError()
-        {
-            await AssertWrite(
-                new ErrorMessage("ERR unknown command 'foobar'"),
-                "-ERR unknown command 'foobar'\r\n");
-        }
-
-        [Test]
-        public async Task WriteInteger()
-        {
-            await AssertWrite(
-                new IntegerMessage(1000),
-                ":1000\r\n");
-        }
-
-        [Test]
-        public async Task WriteBulkString()
-        {
-            await AssertWrite(
-                new BulkStringMessage("foobar"),
-                "$6\r\nfoobar\r\n");
-        }
-
-        [Test]
-        public async Task WriteEmptyBulkString()
-        {
-            await AssertWrite(
-                new BulkStringMessage(string.Empty),
-                "$0\r\n\r\n");
-        }
-
-        [Test]
-        public async Task WriteNullBulkString()
-        {
-            await AssertWrite(
-                new BulkStringMessage(null),
-                "$-1\r\n");
-        }
-
-        [Test]
         public async Task WriteArray()
         {
             await AssertWrite(
@@ -80,11 +32,51 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
+        public async Task WriteBulkString()
+        {
+            await AssertWrite(
+                new BulkStringMessage("foobar"),
+                "$6\r\nfoobar\r\n");
+        }
+
+        [Test]
         public async Task WriteEmptyArray()
         {
             await AssertWrite(
                 new ArrayMessage(new RespMessage[0]),
                 "*0\r\n");
+        }
+
+        [Test]
+        public async Task WriteEmptyBulkString()
+        {
+            await AssertWrite(
+                new BulkStringMessage(string.Empty),
+                "$0\r\n\r\n");
+        }
+
+        [Test]
+        public async Task WriteError()
+        {
+            await AssertWrite(
+                new ErrorMessage("ERR unknown command 'foobar'"),
+                "-ERR unknown command 'foobar'\r\n");
+        }
+
+        [Test]
+        public async Task WriteInlineCommand()
+        {
+            await AssertWrite(
+                new InlineCommandMessage("PING"),
+                "PING\r\n");
+        }
+
+        [Test]
+        public async Task WriteInteger()
+        {
+            await AssertWrite(
+                new IntegerMessage(1000),
+                ":1000\r\n");
         }
 
         [Test]
@@ -102,8 +94,8 @@ namespace Razensoft.Faktory.Tests
                     new ArrayMessage(new RespMessage[]
                     {
                         new SimpleStringMessage("Foo"),
-                        new ErrorMessage("Bar"),
-                    }),
+                        new ErrorMessage("Bar")
+                    })
                 }),
                 "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Foo\r\n-Bar\r\n");
         }
@@ -117,6 +109,14 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
+        public async Task WriteNullBulkString()
+        {
+            await AssertWrite(
+                new BulkStringMessage(null),
+                "$-1\r\n");
+        }
+
+        [Test]
         public async Task WriteNullContainingArray()
         {
             await AssertWrite(
@@ -124,17 +124,17 @@ namespace Razensoft.Faktory.Tests
                 {
                     new BulkStringMessage("foo"),
                     new BulkStringMessage(null),
-                    new BulkStringMessage("bar"),
+                    new BulkStringMessage("bar")
                 }),
                 "*3\r\n$3\r\nfoo\r\n$-1\r\n$3\r\nbar\r\n");
         }
 
         [Test]
-        public async Task WriteInlineCommand()
+        public async Task WriteSimpleString()
         {
             await AssertWrite(
-                new InlineCommandMessage("PING"),
-                "PING\r\n");
+                new SimpleStringMessage("OK"),
+                "+OK\r\n");
         }
     }
 }

@@ -10,11 +10,12 @@ namespace Razensoft.Faktory
 {
     public class FaktoryWorker
     {
-        private FaktoryConnection connection;
-        private CancellationTokenSource fetchCancelSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource fetchCancelSource = new CancellationTokenSource();
 
         // DRAFT - will move to reflection-based
         private readonly Dictionary<string, Action<object[]>> handlers = new Dictionary<string, Action<object[]>>();
+
+        private FaktoryConnection connection;
 
         public string Password { get; set; }
 

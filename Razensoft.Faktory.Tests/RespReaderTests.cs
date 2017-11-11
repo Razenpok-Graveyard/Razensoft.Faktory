@@ -25,11 +25,39 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task ReadSimpleString()
+        public async Task ReadArray()
         {
             await AssertRead(
-                "+OK\r\n",
-                new SimpleStringMessage("OK"));
+                "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n",
+                new ArrayMessage(new RespMessage[]
+                {
+                    new BulkStringMessage("foo"),
+                    new BulkStringMessage("bar")
+                }));
+        }
+
+        [Test]
+        public async Task ReadBulkString()
+        {
+            await AssertRead(
+                "$6\r\nfoobar\r\n",
+                new BulkStringMessage("foobar"));
+        }
+
+        [Test]
+        public async Task ReadEmptyArray()
+        {
+            await AssertRead(
+                "*0\r\n",
+                new ArrayMessage(new RespMessage[0]));
+        }
+
+        [Test]
+        public async Task ReadEmptyBulkString()
+        {
+            await AssertRead(
+                "$0\r\n\r\n",
+                new BulkStringMessage(string.Empty));
         }
 
         [Test]
@@ -49,50 +77,6 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
-        public async Task ReadBulkString()
-        {
-            await AssertRead(
-                "$6\r\nfoobar\r\n",
-                new BulkStringMessage("foobar"));
-        }
-
-        [Test]
-        public async Task ReadEmptyBulkString()
-        {
-            await AssertRead(
-                "$0\r\n\r\n",
-                new BulkStringMessage(string.Empty));
-        }
-
-        [Test]
-        public async Task ReadNullBulkString()
-        {
-            await AssertRead(
-                "$-1\r\n",
-                new BulkStringMessage(null));
-        }
-
-        [Test]
-        public async Task ReadArray()
-        {
-            await AssertRead(
-                "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n",
-                new ArrayMessage(new RespMessage[]
-                {
-                    new BulkStringMessage("foo"),
-                    new BulkStringMessage("bar")
-                }));
-        }
-
-        [Test]
-        public async Task ReadEmptyArray()
-        {
-            await AssertRead(
-                "*0\r\n",
-                new ArrayMessage(new RespMessage[0]));
-        }
-
-        [Test]
         public async Task ReadMixedArray()
         {
             await AssertRead(
@@ -108,8 +92,8 @@ namespace Razensoft.Faktory.Tests
                     new ArrayMessage(new RespMessage[]
                     {
                         new SimpleStringMessage("Foo"),
-                        new ErrorMessage("Bar"),
-                    }),
+                        new ErrorMessage("Bar")
+                    })
                 }));
         }
 
@@ -122,6 +106,14 @@ namespace Razensoft.Faktory.Tests
         }
 
         [Test]
+        public async Task ReadNullBulkString()
+        {
+            await AssertRead(
+                "$-1\r\n",
+                new BulkStringMessage(null));
+        }
+
+        [Test]
         public async Task ReadNullContainingArray()
         {
             await AssertRead(
@@ -130,8 +122,16 @@ namespace Razensoft.Faktory.Tests
                 {
                     new BulkStringMessage("foo"),
                     new BulkStringMessage(null),
-                    new BulkStringMessage("bar"),
+                    new BulkStringMessage("bar")
                 }));
+        }
+
+        [Test]
+        public async Task ReadSimpleString()
+        {
+            await AssertRead(
+                "+OK\r\n",
+                new SimpleStringMessage("OK"));
         }
     }
 }
