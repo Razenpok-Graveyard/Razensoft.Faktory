@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Razensoft.Faktory.Serialization;
 
 namespace Razensoft.Faktory
 {
@@ -24,7 +25,7 @@ namespace Razensoft.Faktory
 
         public async Task PublishAsync(Job job)
         {
-            await connection.SendAsync(new FaktoryMessage(MessageVerb.Push, job));
+            await connection.SendAsync(new FaktoryMessage(MessageVerb.Push, new JobDto(job)));
             var message = await connection.ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");

@@ -15,7 +15,7 @@ namespace Razensoft.Faktory
             Payload = payload;
         }
 
-        public FaktoryMessage(MessageVerb verb, object payload): this(verb, JsonConvert.SerializeObject(payload)) { }
+        public FaktoryMessage(MessageVerb verb, object payload) : this(verb, JsonConvert.SerializeObject(payload)) { }
 
         public FaktoryMessage(SimpleStringMessage message)
         {
@@ -28,14 +28,9 @@ namespace Razensoft.Faktory
 
         public FaktoryMessage(BulkStringMessage bulkString) : this(MessageVerb.None, bulkString.Payload) { }
 
-        private static MessageVerb ParseVerb(string value)
-        {
-            return Enum.TryParse(value, true, out MessageVerb verb) ? verb : MessageVerb.Unknown;
-        }
+        private static MessageVerb ParseVerb(string value) =>
+            Enum.TryParse(value, true, out MessageVerb verb) ? verb : MessageVerb.Unknown;
 
-        public T Deserialize<T>()
-        {
-            return JsonConvert.DeserializeObject<T>(Payload);
-        }
+        public T Deserialize<T>() => JsonConvert.DeserializeObject<T>(Payload);
     }
 }

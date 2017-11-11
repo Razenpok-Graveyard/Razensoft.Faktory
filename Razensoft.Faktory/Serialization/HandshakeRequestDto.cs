@@ -1,9 +1,9 @@
 using System.Runtime.Serialization;
 
-namespace Razensoft.Faktory
+namespace Razensoft.Faktory.Serialization
 {
     [DataContract]
-    public class FaktoryHandshake
+    public class HandshakeRequestDto
     {
         [DataMember(Name = "v")]
         public string Version { get; set; }

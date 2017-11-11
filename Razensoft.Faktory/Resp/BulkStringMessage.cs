@@ -33,14 +33,12 @@ namespace Razensoft.Faktory.Resp
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((BulkStringMessage)obj);
+            return obj.GetType() == GetType() && Equals((BulkStringMessage) obj);
         }
 
-        private bool Equals(BulkStringMessage other)
-        {
-            return ReferenceEquals(null, other.Payload) && ReferenceEquals(null, Payload)
-                || Payload.Equals(other.Payload);
-        }
+        private bool Equals(BulkStringMessage other) =>
+            ReferenceEquals(null, other.Payload) && ReferenceEquals(null, Payload)
+            || Payload.Equals(other.Payload);
 
         public override int GetHashCode() => Payload.GetHashCode();
     }

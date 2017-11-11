@@ -15,9 +15,7 @@ namespace Razensoft.Faktory.Resp
             var typeCharBuffer = new char[1];
             var messageArrived = false;
             while (!messageArrived)
-            {
                 messageArrived = await streamReader.ReadAsync(typeCharBuffer, 0, 1) == 1;
-            }
             switch (typeCharBuffer[0])
             {
                 case SimpleStringMessage.TypeDescriptor:

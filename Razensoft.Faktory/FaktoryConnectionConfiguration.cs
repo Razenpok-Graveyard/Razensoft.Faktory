@@ -2,7 +2,7 @@ using System.Net;
 
 namespace Razensoft.Faktory
 {
-    public class FaktoryConnectionConfiguration: IConnectionConfiguration
+    public class FaktoryConnectionConfiguration : IConnectionConfiguration
     {
         private readonly TcpConnectionFactory transportFactory = new TcpConnectionFactory();
 
@@ -32,11 +32,7 @@ namespace Razensoft.Faktory
 
             public int Port { get; set; } = 7419;
 
-            public IConnectionTransport CreateTransport()
-            {
-                return new TcpConnectionTransport(IpAddress, Port);
-            }
+            public IConnectionTransport CreateTransport() => new TcpConnectionTransport(IpAddress, Port);
         }
-
     }
 }

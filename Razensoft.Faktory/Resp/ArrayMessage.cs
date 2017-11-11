@@ -35,15 +35,13 @@ namespace Razensoft.Faktory.Resp
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((ArrayMessage)obj);
+            return obj.GetType() == GetType() && Equals((ArrayMessage) obj);
         }
 
-        private bool Equals(ArrayMessage other)
-        {
-            return ReferenceEquals(null, other.Payload) && ReferenceEquals(null, Payload)
-                || ReferenceEquals(Payload, other.Payload)
-                || Payload.SequenceEqual(other.Payload);
-        }
+        private bool Equals(ArrayMessage other) =>
+            ReferenceEquals(null, other.Payload) && ReferenceEquals(null, Payload)
+            || ReferenceEquals(Payload, other.Payload)
+            || Payload.SequenceEqual(other.Payload);
 
         public override int GetHashCode() => Payload.GetHashCode();
     }

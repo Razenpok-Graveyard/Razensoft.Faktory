@@ -5,24 +5,28 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Razensoft.Faktory.Resp;
+using Razensoft.Faktory.Serialization;
 
 namespace Razensoft.Faktory
 {
-    public class FaktoryConnection: IDisposable
+    public class FaktoryConnection : IDisposable
     {
         private readonly IConnectionConfiguration configuration;
-        private IConnectionTransport transport;
         private bool isDisposed;
         private RespReader reader;
         private RespWriter respWriter;
         private StreamWriter streamWriter;
+        private IConnectionTransport transport;
 
-        public FaktoryConnection(IConnectionConfiguration configuration)
+        public FaktoryConnection(IConnectionConfiguration configuration) => this.configuration = configuration;
+
+        public FaktoryConnection() : this(new FaktoryConnectionConfiguration()) { }
+
+        public void Dispose()
         {
-            this.configuration = configuration;
+            isDisposed = true;
+            transport.Dispose();
         }
-
-        public FaktoryConnection(): this(new FaktoryConnectionConfiguration()) { }
 
         public async Task ConnectAsync()
         {
@@ -36,11 +40,11 @@ namespace Razensoft.Faktory
             if (message.Verb != MessageVerb.Hi)
                 throw new Exception("Whoopsie");
             Console.WriteLine($"HI {message.Payload}");
-            // TODO: proper handling + version
-            var handshake = message.Deserialize<FaktoryHandshake>();
+            // TODO: proper version handling
+            var handshake = message.Deserialize<HandshakeRequestDto>();
             if (handshake.Nonce != null)
                 configuration.Identity.PasswordHash = GetPasswordHash(configuration.Password, handshake.Nonce);
-            await SendAsync(new FaktoryMessage(MessageVerb.Hello, configuration.Identity));
+            await SendAsync(new FaktoryMessage(MessageVerb.Hello, new HandshakeResponseDto(configuration.Identity)));
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");
@@ -61,7 +65,7 @@ namespace Razensoft.Faktory
 
         private async void MaintainHeartBeatAsync()
         {
-            var message = new FaktoryMessage(MessageVerb.Beat, configuration.Identity);
+            var message = new FaktoryMessage(MessageVerb.Beat, new BeatRequestDto(configuration.Identity));
             while (!isDisposed)
             {
                 await SendAsync(message);
@@ -70,19 +74,15 @@ namespace Razensoft.Faktory
             }
         }
 
-        private static StreamReader CreateStreamReader(Stream stream)
-        {
-            return new StreamReader(stream, Encoding.ASCII, true, 1024, true);
-        }
+        private static StreamReader CreateStreamReader(Stream stream) =>
+            new StreamReader(stream, Encoding.ASCII, true, 1024, true);
 
-        private static StreamWriter CreateStreamWriter(Stream stream)
-        {
-            return new StreamWriter(stream, Encoding.ASCII, 1024, true)
+        private static StreamWriter CreateStreamWriter(Stream stream) =>
+            new StreamWriter(stream, Encoding.ASCII, 1024, true)
             {
                 AutoFlush = false,
-                NewLine = "\r\n",
+                NewLine = "\r\n"
             };
-        }
 
         public async Task<FaktoryMessage> ReceiveAsync()
         {
@@ -103,12 +103,6 @@ namespace Razensoft.Faktory
             var respMessage = new InlineCommandMessage(line);
             await respWriter.WriteAsync(respMessage);
             await streamWriter.FlushAsync();
-        }
-
-        public void Dispose()
-        {
-            isDisposed = true;
-            transport.Dispose();
         }
     }
 }
