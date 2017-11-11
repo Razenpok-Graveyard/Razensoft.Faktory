@@ -8,14 +8,11 @@ namespace Razensoft.Faktory
 {
     public class FaktoryWorker
     {
-        private readonly CancellationTokenSource fetchCancelSource = new CancellationTokenSource();
         private readonly FaktoryWorkerConfiguration configuration;
+        private readonly CancellationTokenSource fetchCancelSource = new CancellationTokenSource();
         private bool isTerminating;
 
-        public FaktoryWorker(FaktoryWorkerConfiguration configuration)
-        {
-            this.configuration = configuration;
-        }
+        public FaktoryWorker(FaktoryWorkerConfiguration configuration) => this.configuration = configuration;
 
         public async Task RunAsync()
         {
@@ -54,7 +51,7 @@ namespace Razensoft.Faktory
                 if (response.Payload != null)
                 {
                     var dto = response.Deserialize<BeatResponseDto>();
-                    switch (dto.Signal)
+                    switch (dto.State)
                     {
                         case BeatState.Quiet:
                             fetchCancelSource.Cancel();

@@ -11,10 +11,10 @@ namespace Razensoft.Faktory
     public class FaktoryConnection : IDisposable
     {
         private readonly IConnectionConfiguration configuration;
+        private readonly string id = Guid.NewGuid().ToString();
         private RespReader reader;
         private RespWriter respWriter;
         private IConnectionTransport transport;
-        private readonly string id = Guid.NewGuid().ToString();
 
         public FaktoryConnection(IConnectionConfiguration configuration) => this.configuration = configuration;
 
@@ -32,25 +32,29 @@ namespace Razensoft.Faktory
             var message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Hi)
                 throw new Exception("Whoopsie");
-            // TODO: proper version handling
             var handshake = message.Deserialize<HandshakeRequestDto>();
+            if (handshake.Version > configuration.Identity.ProtocolVersion)
+            {
+                Console.WriteLine("Faktory protocol has been upgraded recently. Please, upgrade worker library.");
+                Environment.Exit(0);
+            }
             if (handshake.Nonce != null)
-                configuration.Identity.PasswordHash = GetPasswordHash(configuration.Password, handshake.Nonce);
+                configuration.Identity.PasswordHash =
+                    GetPasswordHash(configuration.Password, handshake.Nonce, handshake.HashIterations);
             await SendAsync(new FaktoryMessage(MessageVerb.Hello, new HandshakeResponseDto(configuration.Identity)));
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");
         }
 
-        private static string GetPasswordHash(string password, string nonce)
+        public static string GetPasswordHash(string password, string nonce, int iterations)
         {
-            using (var sha = SHA256.Create())
-            {
-                var encoding = Encoding.ASCII;
-                var bytes = encoding.GetBytes(password + nonce);
-                var hash = sha.ComputeHash(bytes);
-                return string.Concat(hash.Select(b => b.ToString("x2")));
-            }
+            var data = Encoding.ASCII.GetBytes(password + nonce);
+            var sha = SHA256.Create();
+            for (var i = 0; i < iterations; i++)
+                data = sha.ComputeHash(data);
+            sha.Dispose();
+            return string.Concat(data.Select(b => b.ToString("x2")));
         }
 
         public async Task<FaktoryMessage> ReceiveAsync()

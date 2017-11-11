@@ -6,6 +6,8 @@ namespace Razensoft.Faktory
 {
     public class ConnectionIdentity
     {
+        public int ProtocolVersion { get; } = 2;
+
         public string WorkerId { get; set; }
 
         public string Hostname { get; set; }

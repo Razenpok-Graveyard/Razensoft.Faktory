@@ -5,7 +5,7 @@ namespace Razensoft.Faktory.Serialization
     [DataContract]
     public class BeatResponseDto
     {
-        [DataMember(Name = "signal")]
-        public BeatState? Signal { get; set; }
+        [DataMember(Name = "state")]
+        public BeatState? State { get; set; }
     }
 }

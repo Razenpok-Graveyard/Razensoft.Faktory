@@ -9,6 +9,7 @@ namespace Razensoft.Faktory.Serialization
         public HandshakeResponseDto(ConnectionIdentity identity)
         {
             WorkerId = identity.WorkerId;
+            Version = identity.ProtocolVersion;
             Hostname = identity.Hostname;
             ProcessId = identity.ProcessId;
             Labels = identity.Labels;
@@ -17,6 +18,9 @@ namespace Razensoft.Faktory.Serialization
 
         [DataMember(Name = "wid")]
         public string WorkerId { get; set; }
+
+        [DataMember(Name = "v")]
+        public int Version { get; set; }
 
         [DataMember(Name = "hostname", EmitDefaultValue = false)]
         public string Hostname { get; set; }
