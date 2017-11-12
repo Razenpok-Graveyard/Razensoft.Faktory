@@ -1,26 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace Razensoft.Faktory
 {
-    public class FaktoryWorkerConfiguration
+    public class FaktoryWorkerConfiguration : FaktoryConnectorConfiguration
     {
         private readonly Dictionary<string, Action<object[]>> handlers = new Dictionary<string, Action<object[]>>();
 
-        public FaktoryConnectionConfiguration Connection { get; } = new FaktoryConnectionConfiguration();
+        private FaktoryWorkerConfiguration(WorkerConnectionIdentity identity) : base(identity) => Identity = identity;
 
-        public IPAddress IpAddress
-        {
-            get => Connection.IpAddress;
-            set => Connection.IpAddress = value;
-        }
+        public FaktoryWorkerConfiguration() : this(WorkerConnectionIdentity.GenerateNew()) { }
 
-        public int Port
-        {
-            get => Connection.Port;
-            set => Connection.Port = value;
-        }
+        public WorkerConnectionIdentity Identity { get; }
 
         public TimeSpan HeartBeatPeriod { get; set; } = TimeSpan.FromSeconds(15);
 
@@ -30,7 +21,6 @@ namespace Razensoft.Faktory
 
         // DRAFT - will move to reflection-based
         public IReadOnlyDictionary<string, Action<object[]>> Handlers => handlers;
-
 
         public void Register(string job, Action<object[]> handler)
         {

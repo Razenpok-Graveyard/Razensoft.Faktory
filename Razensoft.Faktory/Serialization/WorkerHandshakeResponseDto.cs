@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace Razensoft.Faktory.Serialization
 {
     [DataContract]
-    public class HandshakeResponseDto
+    public class WorkerHandshakeResponseDto
     {
-        public HandshakeResponseDto(ConnectionIdentity identity)
+        public WorkerHandshakeResponseDto(WorkerConnectionIdentity identity)
         {
             WorkerId = identity.WorkerId;
             Version = identity.ProtocolVersion;

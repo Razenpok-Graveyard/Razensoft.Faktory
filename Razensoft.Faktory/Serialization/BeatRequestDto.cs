@@ -5,7 +5,7 @@ namespace Razensoft.Faktory.Serialization
     [DataContract]
     public class BeatRequestDto
     {
-        public BeatRequestDto(ConnectionIdentity identity) => WorkerId = identity.WorkerId;
+        public BeatRequestDto(WorkerConnectionIdentity identity) => WorkerId = identity.WorkerId;
 
         [DataMember(Name = "wid")]
         public string WorkerId { get; set; }

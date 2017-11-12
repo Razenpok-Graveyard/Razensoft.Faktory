@@ -6,6 +6,8 @@ namespace Razensoft.Faktory
     {
         private readonly TcpConnectionFactory transportFactory = new TcpConnectionFactory();
 
+        public FaktoryConnectionConfiguration(ConnectionIdentity identity) => Identity = identity;
+
         public IPAddress IpAddress
         {
             get => transportFactory.IpAddress;
@@ -20,7 +22,7 @@ namespace Razensoft.Faktory
 
         public string Password { get; set; }
 
-        public ConnectionIdentity Identity { get; } = ConnectionIdentity.GenerateNew();
+        public ConnectionIdentity Identity { get; }
 
         IConnectionTransportFactory IConnectionConfiguration.TransportFactory => transportFactory;
 

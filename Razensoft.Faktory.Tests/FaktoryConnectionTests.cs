@@ -33,7 +33,7 @@ namespace Razensoft.Faktory.Tests
                 .Returns(transportFactory.Object);
             configuration
                 .Setup(c => c.Identity)
-                .Returns(ConnectionIdentity.GenerateNew);
+                .Returns(WorkerConnectionIdentity.GenerateNew);
             var connection = new FaktoryConnection(configuration.Object);
             await connection.ConnectAsync();
         }

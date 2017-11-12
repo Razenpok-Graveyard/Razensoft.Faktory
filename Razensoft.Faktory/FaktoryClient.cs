@@ -6,10 +6,10 @@ namespace Razensoft.Faktory
 {
     public class FaktoryClient
     {
-        private readonly FaktoryWorkerConfiguration configuration;
+        private readonly FaktoryClientConfiguration configuration;
         private FaktoryConnection connection;
 
-        public FaktoryClient(FaktoryWorkerConfiguration configuration) => this.configuration = configuration;
+        public FaktoryClient(FaktoryClientConfiguration configuration) => this.configuration = configuration;
 
         public async Task ConnectAsync()
         {

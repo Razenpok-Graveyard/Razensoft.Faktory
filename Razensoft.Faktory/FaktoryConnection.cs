@@ -41,7 +41,7 @@ namespace Razensoft.Faktory
             if (handshake.Nonce != null)
                 configuration.Identity.PasswordHash =
                     GetPasswordHash(configuration.Password, handshake.Nonce, handshake.HashIterations);
-            await SendAsync(new FaktoryMessage(MessageVerb.Hello, new HandshakeResponseDto(configuration.Identity)));
+            await SendAsync(new FaktoryMessage(MessageVerb.Hello, configuration.Identity.ToHandshake()));
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
                 throw new Exception("Whoopsie");

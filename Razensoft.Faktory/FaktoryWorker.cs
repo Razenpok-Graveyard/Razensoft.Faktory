@@ -41,7 +41,7 @@ namespace Razensoft.Faktory
         private async void MaintainHeartBeatAsync()
         {
             var beatConnection = await EstablishNewConnection();
-            var message = new FaktoryMessage(MessageVerb.Beat, new BeatRequestDto(configuration.Connection.Identity));
+            var message = new FaktoryMessage(MessageVerb.Beat, new BeatRequestDto(configuration.Identity));
             while (!isTerminating)
             {
                 await beatConnection.SendAsync(message);
