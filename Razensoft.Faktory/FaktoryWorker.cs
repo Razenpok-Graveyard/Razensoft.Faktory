@@ -33,7 +33,7 @@ namespace Razensoft.Faktory
                         await ExecuteJobAsync(new Job(message.Deserialize<JobDto>()), jobConnection);
                         break;
                     default:
-                        throw new Exception("Whoopsie");
+                        throw new Exception($"Received unexpected fetch verb {message.Verb}");
                 }
             }
         }
@@ -47,7 +47,7 @@ namespace Razensoft.Faktory
                 await beatConnection.SendAsync(message);
                 var response = await beatConnection.ReceiveAsync();
                 if (response.Verb != MessageVerb.Ok)
-                    throw new Exception("Whoopsie");
+                    throw new Exception($"Received unexpected beat verb {message.Verb}");
                 if (response.Payload != null)
                 {
                     var dto = response.Deserialize<BeatResponseDto>();
@@ -100,7 +100,7 @@ namespace Razensoft.Faktory
             await jobConnection.SendAsync(new FaktoryMessage(MessageVerb.Ack, new AckDto(job)));
             var message = await jobConnection.ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
-                throw new Exception("Whoopsie");
+                throw new Exception($"Received unexpected ack response verb {message.Verb}");
         }
 
         private static async Task Fail(FailDto fail, FaktoryConnection jobConnection)
@@ -108,7 +108,7 @@ namespace Razensoft.Faktory
             await jobConnection.SendAsync(new FaktoryMessage(MessageVerb.Fail, fail));
             var message = await jobConnection.ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
-                throw new Exception("Whoopsie");
+                throw new Exception($"Received unexpected fail response verb {message.Verb}");
         }
     }
 }

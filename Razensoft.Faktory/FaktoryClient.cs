@@ -22,7 +22,7 @@ namespace Razensoft.Faktory
             await connection.SendAsync(new FaktoryMessage(MessageVerb.Push, new JobDto(job)));
             var message = await connection.ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
-                throw new Exception("Whoopsie");
+                throw new Exception($"Received unexpected push response verb {message.Verb}");
         }
     }
 }

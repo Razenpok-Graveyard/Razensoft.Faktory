@@ -31,7 +31,7 @@ namespace Razensoft.Faktory
             respWriter = new RespWriter(stream);
             var message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Hi)
-                throw new Exception("Whoopsie");
+                throw new Exception($"Received unexpected handshake verb {message.Verb}");
             var handshake = message.Deserialize<HandshakeRequestDto>();
             if (handshake.Version > configuration.Identity.ProtocolVersion)
             {
@@ -44,7 +44,7 @@ namespace Razensoft.Faktory
             await SendAsync(new FaktoryMessage(MessageVerb.Hello, configuration.Identity.ToHandshake()));
             message = await ReceiveAsync();
             if (message.Verb != MessageVerb.Ok)
-                throw new Exception("Whoopsie");
+                throw new Exception($"Received unexpected handshake confirmation verb {message.Verb}");
         }
 
         public static string GetPasswordHash(string password, string nonce, int iterations)
