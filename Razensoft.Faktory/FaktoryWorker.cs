@@ -2,12 +2,14 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Razensoft.Faktory.Logging;
 using Razensoft.Faktory.Serialization;
 
 namespace Razensoft.Faktory
 {
     public class FaktoryWorker
     {
+        private static Log Log { get; } = new Log(typeof(FaktoryWorker));
         private readonly FaktoryWorkerConfiguration configuration;
         private readonly CancellationTokenSource fetchCancelSource = new CancellationTokenSource();
         private bool isTerminating;
@@ -81,7 +83,7 @@ namespace Razensoft.Faktory
                 return;
             if (!configuration.Handlers.TryGetValue(job.Type, out var handler))
             {
-                Console.WriteLine($"Cannot execute {job.Type}. Aborting.");
+                Log.Error($"Cannot execute {job.Type}. Aborting.");
                 var fail = new FailDto(job)
                 {
                     ErrorMessage = $"Cannot execute {job.Type}"

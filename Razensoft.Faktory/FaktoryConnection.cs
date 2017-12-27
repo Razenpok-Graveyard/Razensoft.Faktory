@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Razensoft.Faktory.Logging;
 using Razensoft.Faktory.Resp;
 using Razensoft.Faktory.Serialization;
 
@@ -10,6 +11,7 @@ namespace Razensoft.Faktory
 {
     public class FaktoryConnection : IDisposable
     {
+        private static Log Log { get; } = new Log(typeof(FaktoryConnection));
         private readonly IConnectionConfiguration configuration;
         private readonly string id = Guid.NewGuid().ToString();
         private RespReader reader;
@@ -35,7 +37,7 @@ namespace Razensoft.Faktory
             var handshake = message.Deserialize<HandshakeRequestDto>();
             if (handshake.Version > configuration.Identity.ProtocolVersion)
             {
-                Console.WriteLine("Faktory protocol has been upgraded recently. Please, upgrade worker library.");
+                Log.Error("Faktory protocol has been upgraded recently. Please, upgrade worker library.");
                 Environment.Exit(0);
             }
             if (handshake.Nonce != null)
@@ -64,10 +66,10 @@ namespace Razensoft.Faktory
             switch (respMessage)
             {
                 case SimpleStringMessage simpleString:
-                    Console.WriteLine($"{id} - receiving {simpleString.Payload}");
+                    Log.Trace($"{id} - receiving {simpleString.Payload}");
                     return new FaktoryMessage(simpleString);
                 case BulkStringMessage bulkString:
-                    Console.WriteLine($"{id} - receiving {bulkString.Payload}");
+                    Log.Trace($"{id} - receiving {bulkString.Payload}");
                     return new FaktoryMessage(bulkString);
             }
             return new FaktoryMessage(MessageVerb.Unknown, null);
@@ -76,7 +78,7 @@ namespace Razensoft.Faktory
         public async Task SendAsync(FaktoryMessage message)
         {
             var line = $"{message.Verb.ToString().ToUpper()} {message.Payload}";
-            Console.WriteLine($"{id} - sending {line}");
+            Log.Trace($"{id} - sending {line}");
             var respMessage = new InlineCommandMessage(line);
             await respWriter.WriteAsync(respMessage);
         }
