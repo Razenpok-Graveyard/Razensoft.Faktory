@@ -6,6 +6,6 @@ namespace Razensoft.Faktory
 {
     public interface IConnectionTransport : IDisposable
     {
-        Task<Stream> GetStream();
+        Task<Stream> GetStreamAsync();
     }
 }

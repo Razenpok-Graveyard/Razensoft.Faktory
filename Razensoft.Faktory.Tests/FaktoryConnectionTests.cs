@@ -21,7 +21,7 @@ namespace Razensoft.Faktory.Tests
             stream.Position = 0;
             var transport = new Mock<IConnectionTransport>();
             transport
-                .Setup(t => t.GetStream())
+                .Setup(t => t.GetStreamAsync())
                 .Returns(Task.FromResult((Stream) stream));
             var transportFactory = new Mock<IConnectionTransportFactory>();
             transportFactory

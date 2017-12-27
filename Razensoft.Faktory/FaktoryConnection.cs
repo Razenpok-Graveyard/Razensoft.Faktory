@@ -26,7 +26,7 @@ namespace Razensoft.Faktory
         public async Task ConnectAsync()
         {
             transport = configuration.TransportFactory.CreateTransport();
-            var stream = await transport.GetStream();
+            var stream = await transport.GetStreamAsync();
             reader = new RespReader(stream);
             respWriter = new RespWriter(stream);
             var message = await ReceiveAsync();

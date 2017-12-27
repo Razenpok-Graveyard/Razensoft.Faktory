@@ -18,7 +18,7 @@ namespace Razensoft.Faktory
             tcpClient = new TcpClient();
         }
 
-        public async Task<Stream> GetStream()
+        public async Task<Stream> GetStreamAsync()
         {
             await tcpClient.ConnectAsync(ipAddress, port);
             return tcpClient.GetStream();
