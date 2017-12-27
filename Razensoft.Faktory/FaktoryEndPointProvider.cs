@@ -17,7 +17,12 @@ namespace Razensoft.Faktory
             return provider?.Invoke();
         }
 
-        public static FaktoryEndPointProvider FromIpAddressAndPort(IPAddress ipAddress, int port = 7419)
+        public static FaktoryEndPointProvider FromIpAddress(IPAddress ipAddress)
+        {
+            return FromIpAddressAndPort(ipAddress, 7419);
+        }
+
+        public static FaktoryEndPointProvider FromIpAddressAndPort(IPAddress ipAddress, int port)
         {
             return new FaktoryEndPointProvider(() => new IPEndPoint(ipAddress, port));
         }
