@@ -1,38 +1,44 @@
+using System;
 using System.Net;
 
 namespace Razensoft.Faktory
 {
     public class FaktoryConnectionConfiguration : IConnectionConfiguration
     {
-        private readonly TcpConnectionFactory transportFactory = new TcpConnectionFactory();
+        private readonly Lazy<IPEndPoint> endPoint;
 
-        public FaktoryConnectionConfiguration(ConnectionIdentity identity) => Identity = identity;
-
-        public IPAddress IpAddress
+        public FaktoryConnectionConfiguration(ConnectionIdentity identity)
         {
-            get => transportFactory.IpAddress;
-            set => transportFactory.IpAddress = value;
+            Identity = identity;
+            endPoint = new Lazy<IPEndPoint>(GetEndpoint);
         }
 
-        public int Port
-        {
-            get => transportFactory.Port;
-            set => transportFactory.Port = value;
-        }
+        public FaktoryEndPointProvider EndPointProvider { get; set; } =
+            FaktoryEndPointProvider.FromEnvironmentVariables();
 
         public string Password { get; set; }
 
         public ConnectionIdentity Identity { get; }
 
-        IConnectionTransportFactory IConnectionConfiguration.TransportFactory => transportFactory;
+        private IPEndPoint GetEndpoint()
+        {
+            return EndPointProvider.GetEndPoint();
+        }
+
+        IConnectionTransportFactory IConnectionConfiguration.TransportFactory =>
+            new TcpConnectionFactory(endPoint.Value);
 
         private class TcpConnectionFactory : IConnectionTransportFactory
         {
-            public IPAddress IpAddress { get; set; } = IPAddress.Any;
+            public TcpConnectionFactory(IPEndPoint endPoint)
+            {
+                EndPoint = endPoint;
+            }
 
-            public int Port { get; set; } = 7419;
+            private IPEndPoint EndPoint { get; }
 
-            public IConnectionTransport CreateTransport() => new TcpConnectionTransport(IpAddress, Port);
+            public IConnectionTransport CreateTransport() =>
+                new TcpConnectionTransport(EndPoint.Address, EndPoint.Port);
         }
     }
 }
