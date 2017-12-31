@@ -7,7 +7,7 @@ namespace Razensoft.Faktory
 
         public FaktoryConnectionConfiguration Connection { get; }
 
-        public string Password
+        public Password Password
         {
             get => Connection.Password;
             set => Connection.Password = value;

@@ -2,7 +2,7 @@ namespace Razensoft.Faktory
 {
     public interface IConnectionConfiguration
     {
-        string Password { get; }
+        Password Password { get; }
 
         ConnectionIdentity Identity { get; }
 

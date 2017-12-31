@@ -16,7 +16,7 @@ namespace Razensoft.Faktory
         public FaktoryEndPointProvider EndPointProvider { get; set; } =
             FaktoryEndPointProvider.FromEnvironmentVariables();
 
-        public string Password { get; set; }
+        public Password Password { get; set; }
 
         public ConnectionIdentity Identity { get; }
 
