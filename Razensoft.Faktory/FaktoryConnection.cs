@@ -22,6 +22,8 @@ namespace Razensoft.Faktory
 
         public void Dispose()
         {
+            respReader.Dispose();
+            respWriter.Dispose();
             transport.Dispose();
         }
 

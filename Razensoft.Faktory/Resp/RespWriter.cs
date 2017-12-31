@@ -1,10 +1,11 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Razensoft.Faktory.Resp
 {
-    public class RespWriter
+    public class RespWriter: IDisposable
     {
         private readonly StreamWriter streamWriter;
 
@@ -24,6 +25,11 @@ namespace Razensoft.Faktory.Resp
             await streamWriter.WriteAsync(message.MessagePrefix);
             await message.SerializeAsync(streamWriter);
             await streamWriter.FlushAsync();
+        }
+
+        public void Dispose()
+        {
+            streamWriter.Dispose();
         }
     }
 }

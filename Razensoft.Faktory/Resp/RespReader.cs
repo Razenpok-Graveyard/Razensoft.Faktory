@@ -15,7 +15,7 @@ namespace Razensoft.Faktory.Resp
 
         public void Dispose()
         {
-            streamReader?.Dispose();
+            streamReader.Dispose();
         }
 
         private static StreamReader CreateStreamReader(Stream stream) =>
