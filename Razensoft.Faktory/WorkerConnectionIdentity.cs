@@ -23,6 +23,6 @@ namespace Razensoft.Faktory
             Labels = new List<string> {"dotnet"}
         };
 
-        public override object ToHandshake() => new WorkerHandshakeResponseDto(this);
+        public override HandshakeResponseDto CreateHandshake() => new WorkerHandshakeResponseDto(this);
     }
 }
