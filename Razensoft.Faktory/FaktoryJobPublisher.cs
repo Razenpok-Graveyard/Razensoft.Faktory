@@ -4,12 +4,12 @@ using Razensoft.Faktory.Serialization;
 
 namespace Razensoft.Faktory
 {
-    public class FaktoryClient
+    public class FaktoryJobPublisher
     {
-        private readonly FaktoryClientConfiguration configuration;
+        private readonly FaktoryJobPublisherConfiguration configuration;
         private FaktoryConnection connection;
 
-        public FaktoryClient(FaktoryClientConfiguration configuration) => this.configuration = configuration;
+        public FaktoryJobPublisher(FaktoryJobPublisherConfiguration configuration) => this.configuration = configuration;
 
         public async Task ConnectAsync()
         {

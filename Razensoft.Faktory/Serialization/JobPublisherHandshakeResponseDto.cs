@@ -3,9 +3,9 @@ using System.Runtime.Serialization;
 namespace Razensoft.Faktory.Serialization
 {
     [DataContract]
-    public class ClientHandshakeResponseDto
+    public class JobPublisherHandshakeResponseDto
     {
-        public ClientHandshakeResponseDto(ClientConnectionIdentity identity)
+        public JobPublisherHandshakeResponseDto(JobPublisherConnectionIdentity identity)
         {
             Version = identity.ProtocolVersion;
             PasswordHash = identity.PasswordHash;
