@@ -1,3 +1,5 @@
+# THIS PROJECT IS NOT SUPPORTED. Feel free to fork or whatever.
+
 # Razensoft.Faktory
 
 .NET implementation of [Faktory](https://github.com/contribsys/faktory) worker and client
